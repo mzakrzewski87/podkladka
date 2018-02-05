@@ -1,0 +1,205 @@
+﻿<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Podkładka / Washer template</title>
+  
+    <style>
+        table, p
+        {
+            font-family: sans-serif, sans;
+        }
+
+        td, th
+        {
+            border: 1px solid #000000;
+            text-align: left;
+            padding: 1px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<form>
+    <table>
+        <tr>
+            <td><input type="text" id="pole_R" value="25.4"/></td>
+            <td>R [mm]</td>
+            <td>promień zewnętrzny</td>
+            <td>external radius</td>
+        </tr>
+        <tr>
+            <td><input type="text" id="pole_r" value="12.7"/></td>
+            <td>r [mm]</td>
+            <td>promień wewnętrzny</td>
+            <td>internal radius</td>
+        </tr>
+        <tr>
+            <td><input type="text" id="pole_dpi" value="96"/></td>
+            <td>dpi [piksele/cal] [dots per inch] </td>
+            <td>dotyczy także wykresu 3W</td>
+            <td>applies also to 3D graph</td>
+        </tr>
+    </table>
+</form>
+
+<br>
+
+<table>
+    <tr>
+        <td>
+            <button onclick="zbierz_dane();
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                rysuj_podkladke();">podkładka / washer</button>
+        </td>
+    </tr>
+</table>
+
+<br>
+
+<canvas id="myCanvas" width="800" height="600" style="border:1px solid #000000;">Ups!</canvas>
+
+<p>
+Copyright (C) 2018 Michał Zakrzewski
+<br>
+m(dot)zakrzewski87(at)gmail(dot)com
+<br>
+</p>
+<pre>
+    This file is part of rury.
+
+    rury is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.
+
+    rury is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with rury.  If not, see <a href=http://www.gnu.org/licenses/>this</a>
+</pre>
+<pre>
+    Ten plik jest częścią rur.
+
+    rury są wolnym oprogramowaniem: możesz je rozprowadzać dalej
+    i/lub modyfikować na warunkach  Pomniejszej Powszechnej Licencji Publicznej GNU,
+    wydanej przez Fundację Wolnego Oprogramowania - według wersji 3 tej
+    Licencji lub (według twojego wyboru) którejś z późniejszych wersji.
+
+    rury rozpowszechniane są z nadzieją, iż będą one
+    użyteczne - jednak BEZ JAKIEJKOLWIEK GWARANCJI, nawet domyślnej
+    gwarancji PRZYDATNOŚCI HANDLOWEJ albo PRZYDATNOŚCI DO OKREŚLONYCH
+    ZASTOSOWAŃ. W celu uzyskania bliższych informacji sięgnij do
+    Pomniejszej Powszechnej Licencji Publicznej GNU.
+
+    Z pewnością wraz z rurami otrzymałeś też egzemplarz Pomniejszej
+    Powszechnej Licencji Publicznej GNU (GNU Lesser General Public License).
+    Jeśli nie - zobacz <a href=http://www.gnu.org/licenses/>to</a>
+</pre>
+
+<script type="text/javascript" charset="utf-8">
+
+    var wej = {R: 25.4, r: 12.7, dpi: 96, piksele_na_mm: 96/25.4};
+    
+    //punkt odzwierciedlający początek układu współrzędnych (0,0,0)
+    var POCZATEK_X = 200; var POCZATEK_Y = 400;
+    var POCZATEK_X_SZABLON = 5; var POCZATEK_Y_SZABLON = 5;
+    
+    var canvas = document.getElementById("myCanvas");
+    var ctx = canvas.getContext("2d");
+
+function rysuj_linie(x1,y1,x2,y2,kolor)
+{
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.lineWidth=1;
+    ctx.strokeStyle=kolor;
+    ctx.stroke();	
+}
+
+function szkicuj_linie(x1,y1,x2,y2)
+{
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+}
+
+function draw_circle(x,y,r,kolor)
+{
+    ctx.beginPath();
+    ctx.arc(x,y,r,0*Math.PI,2*Math.PI)
+    ctx.lineWidth=1;
+    ctx.strokeStyle=kolor;
+    ctx.stroke();
+}
+
+function rgb(r, g, b)
+{
+    return ["rgb(",r,",",g,",",b,")"].join("");
+}
+
+function rysuj_podkladke()
+{
+    rysuj_linie(POCZATEK_X - (wej.R * wej.piksele_na_mm),
+                POCZATEK_Y,
+                POCZATEK_X + (wej.R * wej.piksele_na_mm),
+                POCZATEK_Y,
+                "#000000");
+                
+    rysuj_linie(POCZATEK_X,
+                POCZATEK_Y - (wej.R * wej.piksele_na_mm),
+                POCZATEK_X,
+                POCZATEK_Y + (wej.R * wej.piksele_na_mm),
+                "#000000");
+                
+    draw_circle(POCZATEK_X, POCZATEK_Y, wej.R * wej.piksele_na_mm, "#000000");
+    
+    draw_circle(POCZATEK_X, POCZATEK_Y, wej.r * wej.piksele_na_mm, "#000000");
+    
+    ctx.font = "10px Arial";
+    ctx.fillStyle = '#ff0000';
+    ctx.fillText("r: " + wej.r.toPrecision(4) + " mm, R: " + wej.R.toPrecision(4) + " mm", POCZATEK_X + 10, POCZATEK_Y + 10);
+    //ctx.fillText("Obwód: " + (Math.PI*2*r).toPrecision(6) + "mm", POCZATEK_X_SZABLON + 10, POCZATEK_Y_SZABLON + 40);
+    ctx.fillText(wej.dpi.toPrecision(4) + " dpi", POCZATEK_X + 10, POCZATEK_Y + 25);
+}
+
+function zbierz_dane()
+{
+    wej.R = parseFloat(document.getElementById("pole_R").value);
+    wej.r = parseFloat(document.getElementById("pole_r").value);
+    wej.dpi = parseFloat(document.getElementById("pole_dpi").value);
+
+    POCZATEK_X = canvas.width / 2;
+    POCZATEK_Y = canvas.height / 2;
+
+    if(wej.R < 0)
+    {
+        wej.R = - wej.R;
+        document.getElementById("pole_R").value = wej.R;
+    }
+
+    if(wej.r < 0)
+    {
+        wej.r = - wej.r;
+        document.getElementById("pole_r").value = wej.r;
+    }
+    
+    if(wej.dpi < 0)
+    {
+        wej.dpi = - wej.dpi;
+        document.getElementById("pole_dpi").value = wej.dpi;
+    }
+
+    wej.piksele_na_mm = wej.dpi / 25.4;
+}
+
+</script>
+</body>
+</html>
